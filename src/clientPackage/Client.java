@@ -2,39 +2,34 @@ package clientPackage;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+
 public class Client {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+
         try {
             Socket socket = new Socket("localhost", 5000);
-            System.out.println("Client connecté au serveur !");
-            DataInputStream in = new DataInputStream(socket.getInputStream());
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            System.out.println("Connecté au serveur !");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
             boolean continuer = true;
             while (continuer) {
-                System.out.print("Entrez un entier : ");
-                int x = sc.nextInt();
-                
-                System.out.println("Choisissez l'opération :");
-                System.out.println("1 - Addition (+10)");
-                System.out.println("2 - Soustraction (-10)");
-                System.out.println("3 - Multiplication (*5)");
-                System.out.println("4 - Division (/2)");
-                int choix = sc.nextInt();
-                
-                out.writeInt(x);
-                out.writeInt(choix);
-                out.flush();
-                
-                double resultat = in.readDouble();
-                System.out.println("Résultat reçu du serveur : " + resultat);
-                System.out.print("Voulez-vous continuer ? (oui:1 / non:0) : ");
-                int rep = sc.nextInt();
-                if (rep == 0) {
+                System.out.print("Entrez une opération (ex: 55 * 25) ou 'exit' pour quitter : ");
+                String operation = sc.nextLine();
+
+                out.println(operation);
+
+                if (operation.equalsIgnoreCase("exit")) {
                     continuer = false;
+                    break;
                 }
-            }out.close();
-            in.close();
+
+                String reponse = in.readLine();
+                System.out.println("Réponse du serveur → " + reponse);
+            }
+
             socket.close();
             sc.close();
             System.out.println("Client terminé.");
